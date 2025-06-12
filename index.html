@@ -1,0 +1,509 @@
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temporizador / Timer - Mxlsc</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Reset and base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0000 0%, #3a0000 100%);
+      min-height: 100vh;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+      overflow-x: hidden;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: rgba(30, 0, 0, 0.9);
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    header h1 {
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 700;
+      font-size: 2.8rem;
+      color: #ff4c4c;
+      margin-bottom: 6px;
+      user-select: text;
+    }
+
+    header p {
+      font-weight: 500;
+      font-size: 1rem;
+      color: #ff7a7a;
+      user-select: text;
+    }
+
+    #display {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 5rem;
+      font-weight: 700;
+      color: #ff4c4c;
+      margin: 40px 0 48px 0;
+      user-select: text;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.15em;
+    }
+
+    /* Flicker animation for colons */
+    #display span.colon {
+      animation: flicker 1.2s infinite;
+      user-select: none;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .inputs {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      min-width: 80px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #ff7a7a;
+      margin-bottom: 8px;
+      user-select: none;
+    }
+
+    .form-group input[type="number"] {
+      width: 100%;
+      padding: 10px 0;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 10px;
+      border: 2px solid #aa0000;
+      background: #2a0000;
+      color: #ff9999;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input[type="number"]::-webkit-inner-spin-button,
+    .form-group input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .form-group input[type="number"]:focus {
+      outline: none;
+      border-color: #ff4c4c;
+      background: #3a0000;
+      color: #fff0f0;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 700;
+      font-size: 1.2rem;
+      padding: 14px 36px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      color: #fff0f0;
+      background-color: #aa0000;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      min-width: 110px;
+      user-select: none;
+      position: relative;
+      box-shadow: 0 0 6px #aa0000;
+    }
+
+    button:disabled {
+      background-color: #440000;
+      cursor: not-allowed;
+      color: #aa6666;
+      box-shadow: none;
+    }
+
+    button:not(:disabled):hover {
+      background-color: #ff4c4c;
+      box-shadow:
+        0 0 8px #ff4c4c,
+        0 0 20px #ff1a1a;
+    }
+
+    button:not(:disabled):focus-visible {
+      outline: 2px solid #ff4c4c;
+      outline-offset: 2px;
+    }
+
+    /* Footer cards container */
+    footer {
+      margin-top: 48px;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      user-select: none;
+    }
+
+    /* Each card */
+    .footer-card {
+      background: rgba(30, 0, 0, 0.9);
+      border-radius: 20px;
+      border: 2px solid #aa0000;
+      box-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
+      width: 140px;
+      height: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      position: relative;
+      color: #ff4c4c;
+      font-size: 3.8rem;
+    }
+
+    .footer-card i {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .footer-card:hover,
+    .footer-card:focus-visible {
+      box-shadow:
+        0 0 20px #ff4c4c,
+        0 0 40px #ff1a1a;
+      transform: translateY(-6px);
+      outline: none;
+    }
+
+    .footer-card:focus-visible {
+      outline: 3px solid #ff4c4c;
+      outline-offset: 4px;
+    }
+
+    /* Tooltip text on hover (aria-label used for accessibility) */
+    .footer-card[aria-label]:hover::after,
+    .footer-card[aria-label]:focus-visible::after {
+      content: attr(aria-label);
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #aa0000;
+      color: #fff0f0;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      box-shadow: 0 0 6px #ff4c4c;
+      z-index: 10;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container {
+        max-width: 100%;
+        padding: 28px 24px;
+      }
+
+      header h1 {
+        font-size: 2.4rem;
+      }
+
+      #display {
+        font-size: 4rem;
+        margin: 32px 0 40px 0;
+      }
+
+      .inputs {
+        gap: 14px;
+      }
+
+      .form-group input[type="number"] {
+        font-size: 1.6rem;
+        padding: 8px 0;
+      }
+
+      button {
+        min-width: 100px;
+        padding: 12px 28px;
+        font-size: 1rem;
+      }
+
+      footer {
+        max-width: 100%;
+        gap: 16px;
+      }
+
+      .footer-card {
+        width: 110px;
+        height: 110px;
+        font-size: 3rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #display {
+        font-size: 3rem;
+        margin: 24px 0 28px 0;
+      }
+
+      .form-group input[type="number"] {
+        font-size: 1.3rem;
+        padding: 6px 0;
+      }
+
+      button {
+        min-width: 90px;
+        padding: 10px 24px;
+        font-size: 0.9rem;
+      }
+
+      .footer-card {
+        width: 90px;
+        height: 90px;
+        font-size: 2.4rem;
+      }
+    }
+
+    .animated-bg {
+        background: linear-gradient(135deg, #000000 0%, #2a0000 100%);
+        animation: gradientShift 8s ease infinite;
+    }
+    .floating-elements {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .floating-element {
+        position: absolute;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 70%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    .floating-element:nth-child(3) {
+        width: 100px;
+        height: 100px;
+        bottom: 20%;
+        left: 5%;
+        animation-delay: 4s;
+    }
+  </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+
+  <main class="container" role="main" aria-label="Temporizador principal">
+    <header>
+      <h1 tabindex="0">Temporizador / Timer</h1>
+      <p tabindex="0">Autor: Mxlsc</p>
+    </header>
+
+    <section class="inputs" aria-label="Configuração do temporizador">
+      <div class="form-group">
+        <label for="hours">Horas</label>
+        <input
+          id="hours"
+          type="number"
+          min="0"
+          max="99"
+          value="0"
+          aria-describedby="hours-desc"
+          inputmode="numeric"
+          pattern="[0-9]*"
+        />
+      </div>
+      <div class="form-group">
+        <label for="minutes">Minutos</label>
+        <input
+          id="minutes"
+          type="number"
+          min="0"
+          max="59"
+          value="0"
+          aria-describedby="minutes-desc"
+          inputmode="numeric"
+          pattern="[0-9]*"
+        />
+      </div>
+      <div class="form-group">
+        <label for="seconds">Segundos</label>
+        <input
+          id="seconds"
+          type="number"
+          min="0"
+          max="59"
+          value="0"
+          aria-describedby="seconds-desc"
+          inputmode="numeric"
+          pattern="[0-9]*"
+        />
+      </div>
+    </section>
+
+    <div id="display" aria-live="polite" aria-atomic="true" role="timer" tabindex="0" aria-label="Tempo restante">
+      <span id="hoursDisplay">00</span><span class="colon">:</span><span id="minutesDisplay">00</span><span class="colon">:</span><span id="secondsDisplay">00</span>
+    </div>
+
+    <div class="buttons" role="group" aria-label="Controles do temporizador">
+      <button id="startBtn" type="button" aria-pressed="false" aria-label="Iniciar temporizador">Iniciar</button>
+      <button id="pauseBtn" type="button" aria-pressed="false" aria-label="Pausar temporizador" disabled>Pausar</button>
+      <button id="resetBtn" type="button" aria-label="Resetar temporizador">Resetar</button>
+    </div>
+  </main>
+
+  <footer aria-label="Links de redes sociais e painel">
+    <a
+      href="https://github.com/Mxlsc-XXX"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="GitHub"
+      title="GitHub"
+      class="footer-card"
+      role="link"
+      tabindex="0"
+    >
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a>
+    <a
+      href="https://discordapp.com/users/586608984560238595"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Discord"
+      title="Discord"
+      class="footer-card"
+      role="link"
+      tabindex="0"
+    >
+      <i class="fab fa-discord" aria-hidden="true"></i>
+    </a>
+    <a
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Painel"
+      title="Painel"
+      class="footer-card"
+      role="link"
+      tabindex="0"
+    >
+      <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
+    </a>
+    <a
+      href="https://wa.me/+5513974140538"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Whatsapp"
+      title="Whatsapp"
+      class="footer-card"
+      role="link"
+      tabindex="0"
+    >
+      <i class="fab fa-whatsapp" aria-hidden="true"></i>
+    </a>
+  </footer>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
